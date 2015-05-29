@@ -108,11 +108,12 @@ public class A1Controller extends HttpServlet {
 		handleDispatch(request, response);
 	}
 	
-	private synchronized DatabaseAccess getDAO() {
+	public synchronized DatabaseAccess getDAO() {
 		return (DatabaseAccess)getServletContext().getAttribute("dao");
 	}
 	
-	private void handleLanguages(Cookie[] cookies, HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+	/* Determine the locale to use based on language settings */
+	public void handleLanguages(Cookie[] cookies, HttpSession session, HttpServletRequest request, HttpServletResponse response) {
 		String currentLanguage = "en";
 		String currentCountry = "US";
 		// check if language settings are stored in a cookie
@@ -150,13 +151,14 @@ public class A1Controller extends HttpServlet {
 		Cookie countryCookie = null;
 		languageCookie = new Cookie("languageCookie", currentLanguage);
 		countryCookie = new Cookie("countryCookie", currentCountry);
-		languageCookie.setMaxAge(300);
-		countryCookie.setMaxAge(300);
+		languageCookie.setMaxAge(100);
+		countryCookie.setMaxAge(100);
 		response.addCookie(languageCookie);
 		response.addCookie(countryCookie);
 	}
 	
-	private void setStaticText(HttpSession session, String currentLanguage, String currentCountry)  {
+	/* Set static text based on the chosen language settings */
+	public void setStaticText(HttpSession session, String currentLanguage, String currentCountry)  {
 		resourceBundle = ResourceBundle.getBundle(bundlePath, new Locale(currentLanguage, currentCountry));
 		session.setAttribute("about", resourceBundle.getString("About_Text"));
 		session.setAttribute("buttons", resourceBundle.getString("Buttons_Text"));
@@ -193,7 +195,8 @@ public class A1Controller extends HttpServlet {
 		session.setAttribute("deleteConfirm", resourceBundle.getString("delete_Confirm"));
 	}
 	
-	private void processAuthentication(String propertiesPath, Properties dbProps, Cookie[] cookies, 
+	/* Read the database properties file if the correct password is used at the login */
+	public void processAuthentication(String propertiesPath, Properties dbProps, Cookie[] cookies, 
 			HttpSession session, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// handle authentication if user has logged in already
 		if (cookies != null) {
@@ -202,6 +205,7 @@ public class A1Controller extends HttpServlet {
 					authenticated = true;
 					InputStream is = EncryptionBean.decryptFile(propertiesPath, "java3613", salt, iterationCount);
 					session.setAttribute("authenticated", true);
+					session.setAttribute("login", "java3613");
 					session.setAttribute("properties", dbProps);
 					dbProps.load(is);
 					try {
@@ -232,7 +236,7 @@ public class A1Controller extends HttpServlet {
 				session.setAttribute("login", request.getParameter("login"));
 				if (request.getParameter("remember") != null) {
 					Cookie authenticationCookie = new Cookie ("authenticationCookie", "authenticated");
-					authenticationCookie.setMaxAge(300);
+					authenticationCookie.setMaxAge(100);
 					response.addCookie(authenticationCookie);
 				}
 				try {
@@ -251,7 +255,8 @@ public class A1Controller extends HttpServlet {
 		}
 	}
 	
-	private void readInput(Enumeration input, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	/* Read and validate any form input */
+	public void readInput(Enumeration input, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		while(input.hasMoreElements()) {
 			String nextParam = ((String) input.nextElement()).trim();
 			if(nextParam.compareTo("id") != 0 && nextParam.compareTo("add") != 0 && 
@@ -306,17 +311,18 @@ public class A1Controller extends HttpServlet {
 		}
 	}
 	
-	private void updateTable(HttpSession session, HttpServletRequest request, HttpServletResponse response, 
+	/* Perform any CRUD operations on the table */
+	public void updateTable(HttpSession session, HttpServletRequest request, HttpServletResponse response, 
 			String insert, String update) throws ServletException, IOException {
 		if (request.getParameter("add") != null && validInput && authenticated) {
 			getDAO().insert("a00783233_members", insert, dbProps.getProperty("URL"), dbProps.getProperty("User"), dbProps.getProperty("Password"));
 			summary.add("INSERT INTO a00783233_members " + insert);
 		}
 		if (request.getParameter("update") != null && validInput) {
-			int a = 0;
-			a = 1;
 			getDAO().update("a00783233_members", update, "id='" + request.getParameter("id") + "'", dbProps.getProperty("URL"), dbProps.getProperty("User"), dbProps.getProperty("Password"));
 			summary.add("UPDATE a00783233_members SET " + update + " WHERE id='" + request.getParameter("id") + "'");
+			int a = 0;
+			a = 1;
 		}
 		if (request.getParameter("delete") != null && validInput) {
 			getDAO().delete("a00783233_members", "id='" + request.getParameter("id") + "'", dbProps.getProperty("URL"), dbProps.getProperty("User"), dbProps.getProperty("Password"));
@@ -326,7 +332,8 @@ public class A1Controller extends HttpServlet {
 		session.setAttribute("summaryLength", summary.size());
 	}
 	
-	private void readTable(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	/* Read the current contents of the table */
+	public void readTable(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// read data from the table to determine what is shown in the jsp page
 		int rowCount = getDAO().getRowCount("a00783233_members", dbProps.getProperty("URL"), dbProps.getProperty("User"), dbProps.getProperty("Password"));
 		rowCount = getDAO().getRowCount("a00783233_members", dbProps.getProperty("URL"), dbProps.getProperty("User"), dbProps.getProperty("Password"));
@@ -359,7 +366,8 @@ public class A1Controller extends HttpServlet {
 		}
 	}
 	
-	private void handleDispatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	/* Dispatch request and response to the appropriate page */
+	public void handleDispatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (validInput) {
 			response.setContentType("text/html");
 			// disable caching, so the database information will be freshly retrieved when the page is accessed

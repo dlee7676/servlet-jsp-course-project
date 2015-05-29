@@ -1,5 +1,3 @@
-/* David Lee, A00783233 */
-
 package a00783233.a1;
 
 import java.io.IOException;
@@ -9,7 +7,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
- 
+
 /* Forces responses to use UTF-8 encoding, ensuring that international characters display properly */
 public class UTF8Filter implements Filter {
  

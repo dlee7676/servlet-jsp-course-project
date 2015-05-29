@@ -1,11 +1,9 @@
-/* David Lee, A00783233 */
-
 package a00783233.a1;
 
 import java.util.Locale;
 import javax.servlet.http.Cookie;
 
-/* Used to check the language settings when each page loads */
+/* Checks the current language settings */
 public class CheckLanguage {
 	public static Locale checkCookies(Cookie[] cookies, Locale current) {
 		if (cookies != null) {
