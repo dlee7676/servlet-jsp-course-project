@@ -1,2 +1,3 @@
-# servlet-jsp-course-project
-Course project from a Java web apps class.  Implements basic CRUD operations with servlets/JSP, as well as some other Java features such as internationalization and encryption.
+This project implements a Java web app that allows the user to perform basic CRUD operations on a database table of address records.  The database is in SQL Server, and database access is done with standard JDBC methods.  The project also includes internationalization features, persistence of some settings via cookies, and encryption/decryption of the database connection information.
+
+The project can be deployed using the .war file included in the top level of the repo.
