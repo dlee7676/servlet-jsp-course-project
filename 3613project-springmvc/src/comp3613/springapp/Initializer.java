@@ -14,16 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import comp3613.springapp.db.DatabaseAccess;
+import comp3613.springapp.db.OldJDBC;
 
 public class Initializer implements ServletContextListener {
 	@Autowired
 	private ServletContext sc;
-	private static DatabaseAccess dbAccess;
+	private static OldJDBC dbAccess;
 	private static Properties dbProps;
 	private static SessionFactory sessionFactory;
 	
-	public static DatabaseAccess getDao() {
+	public static OldJDBC getDao() {
 		return dbAccess;
 	}
 	
@@ -50,7 +50,7 @@ public class Initializer implements ServletContextListener {
 			throw new ExceptionInInitializerError(ex);
 		}
 		
-		dbAccess = new DatabaseAccess();
+		dbAccess = new OldJDBC();
 		dbProps = new Properties();
 		String propertiesPath = "/WEB-INF/resources/dbprops.properties";
 		try {

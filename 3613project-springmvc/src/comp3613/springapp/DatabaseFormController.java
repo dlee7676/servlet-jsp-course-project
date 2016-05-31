@@ -15,7 +15,6 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.tutorial.domain.MembersTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,14 +23,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.ui.ModelMap;
 
-import comp3613.springapp.db.DatabaseAccess;
+import comp3613.springapp.db.MemberRecord;
 import comp3613.springapp.util.ValidatorBean;
 
 @Controller
 public class DatabaseFormController {
-	DatabaseAccess dao;
-	Properties dbProps;
-	
 	@RequestMapping(value="/viewDatabase", method=RequestMethod.GET)
 	public ModelAndView viewDatabase() {
 		return new ModelAndView("viewDatabase", "command", new Member());
@@ -122,8 +118,6 @@ public class DatabaseFormController {
 	
 	/* Perform any CRUD operations on the table */
 	public void updateTable(HttpSession session, HttpServletRequest request, String insert, String update, Member member) throws ServletException, IOException {
-		dao = Initializer.getDao();
-		dbProps = Initializer.getProps();
 		//Session hSession = Initializer.getSessionFactory().getCurrentSession();
 		ArrayList<String> summary;
 		if (session.getAttribute("summary") == null)
@@ -133,12 +127,17 @@ public class DatabaseFormController {
 			Session hSession = Initializer.getSessionFactory().getCurrentSession();
 			try {
 				hSession.beginTransaction();
-				MembersTable mt = new MembersTable();
-				mt.setfName("Hibernate");
-				mt.setlName("Test");
-				hSession.save(mt);
+				MemberRecord mr = new MemberRecord();
+				mr.setfName(member.getfName());
+				mr.setlName(member.getlName());
+				mr.setAddress(member.getAddress());
+				mr.setCity(member.getCity());
+				mr.setCode(member.getCode());
+				mr.setCountry(member.getCountry());
+				mr.setPhone(member.getPhone());
+				mr.setEmail(member.getEmail());
+				hSession.save(mr);
 				hSession.getTransaction().commit();
-				/*dao.insert("a00783233_members", insert, "jdbc:sqlserver://Beangrinder.bcit.ca", "javastudent", "compjava");*/
 				summary.add("INSERT INTO a00783233_members " + insert);
 			}
 			catch (HibernateException ex) {
@@ -152,12 +151,17 @@ public class DatabaseFormController {
 			try {
 				hSession.beginTransaction();
 				Long id = new Long(request.getParameter("id"));
-				MembersTable mt = hSession.get(MembersTable.class, id); 
-				mt.setfName(member.getfName());
-				mt.setlName("Hibernate");
-				hSession.update(mt);
+				MemberRecord mr = hSession.get(MemberRecord.class, id); 
+				mr.setfName(member.getfName());
+				mr.setlName(member.getlName());
+				mr.setAddress(member.getAddress());
+				mr.setCity(member.getCity());
+				mr.setCode(member.getCode());
+				mr.setCountry(member.getCountry());
+				mr.setPhone(member.getPhone());
+				mr.setEmail(member.getEmail());
+				hSession.update(mr);
 				hSession.getTransaction().commit();
-				//dao.update("a00783233_members", update, "id='" + member.getId() + "'", "jdbc:sqlserver://Beangrinder.bcit.ca", "javastudent", "compjava");
 				summary.add("UPDATE a00783233_members SET " + update + " WHERE id='" + request.getParameter("id") + "'");
 			}
 			catch (HibernateException ex) {
@@ -171,10 +175,9 @@ public class DatabaseFormController {
 			try {
 				hSession.beginTransaction();
 				Long id = new Long(request.getParameter("id"));
-				MembersTable mt = hSession.get(MembersTable.class, id); 
-				hSession.delete(mt);
+				MemberRecord mr = hSession.get(MemberRecord.class, id); 
+				hSession.delete(mr);
 				hSession.getTransaction().commit();
-				//dao.delete("a00783233_members", "id='" + member.getId() + "'", "jdbc:sqlserver://Beangrinder.bcit.ca", "javastudent", "compjava");
 				summary.add("DELETE FROM a00783233_members WHERE id='" + request.getParameter("id") + "'");
 			}
 			catch (HibernateException ex) {
@@ -193,7 +196,7 @@ public class DatabaseFormController {
 		Session hSession = Initializer.getSessionFactory().getCurrentSession();
 		try {
 			hSession.beginTransaction();
-			List result = hSession.createQuery("from MembersTable").list();
+			List result = hSession.createQuery("from MemberRecord").list();
 			hSession.getTransaction().commit();
 			request.setAttribute("tableList", result);
 		}
@@ -202,36 +205,5 @@ public class DatabaseFormController {
 				hSession.getTransaction().rollback();
 			ex.printStackTrace();
 		}
-		
-		/*dao = Initializer.getDao();
-		dbProps = Initializer.getProps();
-		int rowCount = dao.getRowCount("a00783233_members", "jdbc:sqlserver://Beangrinder.bcit.ca", "javastudent", "compjava");
-		rowCount = dao.getRowCount("a00783233_members", "jdbc:sqlserver://Beangrinder.bcit.ca", "javastudent", "compjava");
-		request.setAttribute("rowCount", rowCount);
-		ArrayList<ArrayList<String>> tableContents = new ArrayList<ArrayList<String>>(); 
-		ResultSet status;
-		try {
-			status = dao.getResultSet("SELECT * FROM a00783233_members", "jdbc:sqlserver://Beangrinder.bcit.ca", "javastudent", "compjava");
-			int row = 0;
-			while (status.next()) {
-				int column = 0;
-				tableContents.add(row, new ArrayList<String>());
-				tableContents.get(row).add(column++, Integer.toString(status.getInt("id")));
-				tableContents.get(row).add(column++, status.getString("fName"));
-				tableContents.get(row).add(column++, status.getString("lName"));
-				tableContents.get(row).add(column++, status.getString("address"));
-				tableContents.get(row).add(column++, status.getString("city"));
-				tableContents.get(row).add(column++, status.getString("code"));
-				tableContents.get(row).add(column++, status.getString("country"));
-				tableContents.get(row).add(column++, status.getString("phone"));
-				tableContents.get(row).add(column++, status.getString("email"));
-				row++;
-			}
-			request.setAttribute("tableContents", tableContents);
-			dao.close();
-		}
-		catch (SQLException ex) {
-			ex.printStackTrace();
-		}*/
 	}
 }

@@ -1,3 +1,4 @@
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.Date" %>
@@ -16,12 +17,11 @@
 	<h1>COMP 3613 Assignment 2</h1>
 </header>
 <h2>${sessionScope.summaryHeading}</h2>
-<% if (session.getAttribute("summary") != null) {
-       for (int i = 0; i < Integer.parseInt(session.getAttribute("summaryLength").toString()); i++) { 
-		   request.setAttribute("count", i);%>
-		   <p>${sessionScope.summary[count]}</p>
-<%     } 
-   } %>
+<c:if test="${sessionScope.summary != null}">
+	<c:forEach var="statement" items="${sessionScope.summary}">
+		<p><c:out value="${statement}" /></p>
+	</c:forEach>
+</c:if>
 <form action="/3613project-springmvc/addMember" method="post">
 	<p><input type="submit" name="select" value="${sessionScope.selectText}" class="btn" /></p>
 </form> 

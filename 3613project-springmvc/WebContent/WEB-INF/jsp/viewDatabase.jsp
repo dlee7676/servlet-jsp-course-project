@@ -50,12 +50,6 @@
 	<h1>COMP 3613 Assignment 2</h1>
 </header>
 
-<p> The row count is ${rowCount}</p>
-<p> You typed in ${insert}</p>
-<p> You updated ${update}</p>
-
-<p> The table existed, so fName = ${fName} </p>
-
 <p><a href="/3613project-springmvc/summary">${sessionScope.summaryLink}</a></p>
 <p><a href="/3613project-springmvc/about">${sessionScope.aboutLink}</a></p>
 <p><a href="/3613project-springmvc/">${sessionScope.indexLink}</a></p>
@@ -77,17 +71,17 @@
 		</tr>
 		<c:if test="${requestScope.tableList != null}">
 	    	<c:forEach var="row" items="${requestScope.tableList}">
-			   	<form:form action="/springappv3a/addMember" method="post">
+			   	<form:form action="/3613project-springmvc/addMember" method="post">
 				<tr>
-					<td><input type="text" name="id" value="${row[0]}" readonly /></td>
-					<td><input type="text" name="fName" value="${row[1]}" /></td>
-					<td><input type="text" name="lName" value="${row[2]}" /></td>
-					<td><input type="text" name="address" value="${row[3]}" /></td>
-					<td><input type="text" name="city" value="${row[4]}" /></td>
-					<td><input type="text" name="code" value="${row[5]}" /></td>
-					<td><input type="text" name="country" value="${row[6]}" /></td>
-					<td><input type="text" name="phone" value="${row[7]}" /></td>
-					<td><input type="text" name="email" value="${row[8]}" /></td>
+					<td><input type="text" name="id" value="${row.getId()}" readonly /></td>
+					<td><input type="text" name="fName" value="${row.getfName()}" /></td>
+					<td><input type="text" name="lName" value="${row.getlName()}" /></td>
+					<td><input type="text" name="address" value="${row.getAddress()}" /></td>
+					<td><input type="text" name="city" value="${row.getCity()}" /></td>
+					<td><input type="text" name="code" value="${row.getCode()}" /></td>
+					<td><input type="text" name="country" value="${row.getCountry()}" /></td>
+					<td><input type="text" name="phone" value="${row.getPhone()}" /></td>
+					<td><input type="text" name="email" value="${row.getEmail()}" /></td>
 					<td><input type="submit" name="update" value="${sessionScope.updateText}" class="btn" />
 						<input type="submit" name="delete" value="${sessionScope.deleteText}" class="btn" 
 							onClick="return confirm('${sessionScope.deleteConfirm}')"/></td>
@@ -95,7 +89,7 @@
 		       	</form:form>
 		    </c:forEach>
 		</c:if>
-		<form:form method="POST" modelAttribute="add" action="/springappv3a/addMember" onSubmit="submitIt(this)">
+		<form:form method="POST" modelAttribute="add" action="/3613project-springmvc/addMember" onSubmit="submitIt(this)">
 			<tr>
 				<td>Autofill</td>
 				<td><input type="text" name="fName" /></td>
